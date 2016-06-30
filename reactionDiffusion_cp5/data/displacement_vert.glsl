@@ -57,7 +57,7 @@ void main()
 	vertColor = color;
 
 	//Define lights
-	ecVertex = vec3(modelview * displacedVertex);
+	ecVertex = vec3(modelview * vertex);
 	ecNormal = normalize(normalMatrix * normal);
 
 	//
@@ -75,5 +75,5 @@ void main()
 		}
 	}
 
-	gl_Position = transform * displacedVertex;
+	gl_Position = transform * vertex;
 }

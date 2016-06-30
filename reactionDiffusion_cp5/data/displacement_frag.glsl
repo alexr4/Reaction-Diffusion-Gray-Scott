@@ -31,7 +31,7 @@ uniform vec3 ka;//Ambient reflectivity
 uniform vec3 ks;//Specular reflectivity
 uniform vec3 emissive; //emissive color
 uniform float shininess;//shine factor
-uniform float minNormalEmissive = 0.5;
+uniform float minNormalEmissive = 0.75;
 
 out vec4 fragColor;
 
@@ -96,6 +96,7 @@ void main()
     vec3 va = normalize(vec3(size.xy,s21-s01));
     vec3 vb = normalize(vec3(size.yx,s12-s10));
     vec3 bump = vec3(cross(va,vb)) * 2.0 - 1.0;
+	bump.g = 1.0 - bump.g; //invert y axis
    
 
     
@@ -105,7 +106,7 @@ void main()
 	normal.x = dFdx(gray);
 	normal.y = dFdy(gray);
 	normal.z = sqrt(1 - normal.x*normal.x - normal.y * normal.y); // Reconstruct z component to get a unit normal.
- 	//vec3 norm = normalize(normal * 2.0 - 1.0);
+ 	vec3 norm = normalize(bump);
 
 	//lights
 	vec4 lightColor = vec4(0.0, 0.0, 0.0, 1.0);
@@ -121,9 +122,9 @@ void main()
 	  }
 	  
 	  lightColor += vec4(ads(direction, lightDiffuse[i].xyz), 1.0) * falloff;
-	  intensityNormalMap += max(dot(normal, lightDir[i]), minNormalEmissive);
+	  intensityNormalMap += max(dot(norm, lightDir[i]), minNormalEmissive);
 	}
-	vec4 final_lightColor =  (vec4(emissive, 1.0)  +  (lightColor * vertColor));
+	vec4 final_lightColor =  (vec4(emissive, 1.0)  +  (lightColor * vertColor)) * intensityNormalMap;
 
 	float inc = 0.25;
 	vec4 Albedo =  toGamma(final_lightColor);
